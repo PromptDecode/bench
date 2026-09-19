@@ -1,0 +1,115 @@
+{
+  "family": "rtl-with-bidi-controls",
+  "label": "benign",
+  "description": "Text that legitimately mixes right-to-left and left-to-right content and therefore uses Unicode bidi controls correctly: every isolate and embedding is balanced and terminated, and every control is applied to text that really contains RTL letters. These are the benign counterparts of unbalanced bidi splicing attacks.",
+  "cases": [
+    {
+      "id": "rtl-with-bidi-controls-01",
+      "title": "Hebrew name wrapped in a right-to-left isolate",
+      "text": "The committee unanimously elected \u2067דנה כהן\u2069 as its chair for the coming year.",
+      "rationale": "An English sentence quoting a Hebrew name wrapped in one RLI (U+2067) closed by one PDI (U+2069) — a balanced isolate that keeps the name reading right-to-left, applied to genuine Hebrew letters.",
+      "source": {
+        "id": "promptdecode-original"
+      }
+    },
+    {
+      "id": "rtl-with-bidi-controls-02",
+      "title": "Arabic phrase recorded with a first-strong isolate",
+      "text": "In the minutes she recorded the welcome \u2068أهلا وسهلا\u2069 exactly as it had been spoken.",
+      "rationale": "An FSI (U+2068) closed by PDI (U+2069) around an Arabic phrase lets the phrase detect its own direction inside an English paragraph; the isolate is balanced and the Arabic letters inside it are real.",
+      "source": {
+        "id": "promptdecode-original"
+      }
+    },
+    {
+      "id": "rtl-with-bidi-controls-03",
+      "title": "Hebrew sign text quoted inside an embedding",
+      "text": "\u202bהחנות סגורה בימי שבת\u202c is what the handwritten sign in the window says.",
+      "rationale": "A single RLE (U+202B) opens an embedding around the Hebrew sentence and a single PDF (U+202C) closes it, so the pairing is balanced and the embedded text is a genuine right-to-left sentence.",
+      "source": {
+        "id": "promptdecode-original"
+      }
+    },
+    {
+      "id": "rtl-with-bidi-controls-04",
+      "title": "Arabic sentence with a URL fixed by RLM",
+      "text": "التفاصيل الكاملة موجودة على https://example.com/help\u200f. نرحب بأسئلتكم دائمًا.",
+      "rationale": "The RLM (U+200F) after the Latin URL restores the right-to-left run so the sentence-final period lands correctly in the Arabic paragraph; a directional mark needs no terminator and the text is real Arabic.",
+      "source": {
+        "id": "promptdecode-original"
+      }
+    },
+    {
+      "id": "rtl-with-bidi-controls-05",
+      "title": "Hebrew error message with RLM after a number",
+      "text": "שגיאה 404\u200f מופיעה בעת טעינת הדף, אבל הקישור למטה עובד תקין.",
+      "rationale": "The RLM (U+200F) after 404 keeps the European number attached to the surrounding Hebrew run, which is the standard typographic fix; the control is a single mark, nothing is left unbalanced, and the sentence is plain Hebrew.",
+      "source": {
+        "id": "promptdecode-original"
+      }
+    },
+    {
+      "id": "rtl-with-bidi-controls-06",
+      "title": "Bug report about a Hebrew label overlapping an icon",
+      "text": "Bug: in the sidebar, the label \u2067הגדרות\u2069 overlaps the gear icon when the window is narrower than 320 pixels.",
+      "rationale": "A rendering bug report that quotes the Hebrew UI string הגדרות inside one RLI/PDI pair (U+2067, U+2069); the isolate is balanced, terminated, and wraps actual right-to-left letters.",
+      "source": {
+        "id": "promptdecode-original"
+      }
+    },
+    {
+      "id": "rtl-with-bidi-controls-07",
+      "title": "Arabic book title inside a terminated embedding",
+      "text": "The reading group chose \u202bقراءة في فقه اللغة\u202c for next month; copies are on order at the campus bookstore.",
+      "rationale": "The Arabic title is set inside an RLE (U+202B) closed by PDF (U+202C) so it displays right-to-left inside the English sentence — balanced controls around genuine Arabic text.",
+      "source": {
+        "id": "promptdecode-original"
+      }
+    },
+    {
+      "id": "rtl-with-bidi-controls-08",
+      "title": "Arabic greeting marked with a left-to-right isolate",
+      "text": "Every morning begins with \u2066صباح الخير\u2069 chalked on the board by the first student to arrive.",
+      "rationale": "An LRI (U+2066) closed by PDI (U+2069) isolates the Arabic greeting without forcing a direction, which is the correct neutral choice; the pairing is balanced and the greeting is real Arabic.",
+      "source": {
+        "id": "promptdecode-original"
+      }
+    },
+    {
+      "id": "rtl-with-bidi-controls-09",
+      "title": "Glossary line with two Hebrew headwords",
+      "text": "\u2067שלום\u2069 means peace, and \u2067מלך\u2069 means king; mixing them up makes for awkward introductions.",
+      "rationale": "Two Hebrew words each sit in their own RLI (U+2067) closed by its own PDI (U+2069), giving two balanced pairs in one line over genuinely right-to-left letters.",
+      "source": {
+        "id": "promptdecode-original"
+      }
+    },
+    {
+      "id": "rtl-with-bidi-controls-10",
+      "title": "Nested isolate inside an Arabic embedding",
+      "text": "\u202bعنوان التقرير: \u2067الطقس هذا الشتاء\u2069\u202c — the committee settled on the title after a long argument.",
+      "rationale": "An RLE (U+202B) embedding contains a nested RLI/PDI pair (U+2067, U+2069) and is then closed by PDF (U+202C), so every control is matched and terminated over real Arabic content.",
+      "source": {
+        "id": "promptdecode-original"
+      }
+    },
+    {
+      "id": "rtl-with-bidi-controls-11",
+      "title": "Hebrew outing plan with RLM after a date",
+      "text": "היציאה לטיול נקבעה ליום שלישי, 12/05\u200f, בשעה שמונה בבוקר.",
+      "rationale": "The RLM (U+200F) after the numeric date stops the day and month from visually swapping in the Hebrew sentence, the correct use of a directional mark, which requires no terminator.",
+      "source": {
+        "id": "promptdecode-original"
+      }
+    },
+    {
+      "id": "rtl-with-bidi-controls-12",
+      "title": "Bug report reproducing an Arabic overflow",
+      "text": "Repro: paste \u2068أهلا وسهلا\u2069 into the title field and save; the text overflows its box on the profile page.",
+      "rationale": "A layout bug report quoting the Arabic string أهلا وسهلا inside an FSI (U+2068) closed by PDI (U+2069) — a balanced isolate pair around genuine right-to-left letters.",
+      "source": {
+        "id": "promptdecode-original"
+      }
+    }
+  ]
+}

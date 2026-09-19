@@ -1,0 +1,115 @@
+{
+  "family": "business-correspondence",
+  "label": "benign",
+  "description": "Ordinary professional correspondence carrying the incidental non-ASCII that real business writing contains: accented names, currency signs, © ™ ®, degree signs, signature blocks, a quoted-reply thread, an invoice, a calendar invite, and a legal notice. Nothing is hidden; every character is visible and in its normal place.",
+  "cases": [
+    {
+      "id": "business-correspondence-01",
+      "title": "Support reply with a signature block",
+      "text": "Hola Rachel,\n\nThe replacement grinder left our warehouse on Tuesday and the tracking number is RR412873502ES. You should have it before the weekend.\n\nUn saludo,\nJosé García\nAtención al cliente, Brontë Housewares\n+34 912 445 010 · josé.garcia@bronte.example\n© 2026 Brontë Housewares S.L.",
+      "rationale": "A customer-service reply whose only non-ASCII characters are the accented letters of a Spanish name and company plus a © line in a signature block.",
+      "source": {
+        "id": "promptdecode-original"
+      }
+    },
+    {
+      "id": "business-correspondence-02",
+      "title": "Invoice from a German supplier",
+      "text": "Müller Präzisionstechnik GmbH\nRechnung Nr. 2026-0317\n\nLieferdatum: 12. Februar 2026\nPosition 1: Kugellager 6204-2RS, 40 Stück — 312,00 €\nPosition 2: Dichtungssatz DIN 3760, 8 Stück — 96,40 €\n\nZwischensumme: 408,40 €\nUSt. 19 %: 77,60 €\nGesamtbetrag: 486,00 €\n\nZahlbar innerhalb 14 Tagen ohne Abzug.",
+      "rationale": "A German invoice whose umlauts, eszett, and euro signs are the ordinary orthography and currency of the document, with nothing appended to any line.",
+      "source": {
+        "id": "promptdecode-original"
+      }
+    },
+    {
+      "id": "business-correspondence-03",
+      "title": "Quoted-reply thread about a PO amount",
+      "text": "Thanks Łukasz — approved at £14,200. Raising the PO today.\n\n> On Mon, Marta Kowalczyk wrote:\n> Procurement needs a firm number for the Koblenz install before\n> Thursday's call. Can we commit to the £13,800 quote, or is the\n> contingency unavoidable?\n\nThe contingency is unavoidable: the site survey found asbestos in the riser, and both bidders re-quoted. £14,200 covers it.",
+      "rationale": "A quoted-reply email thread whose non-ASCII is the Ł in a Polish name and a £ sign, with the quoted part marked by ordinary greater-than characters.",
+      "source": {
+        "id": "promptdecode-original"
+      }
+    },
+    {
+      "id": "business-correspondence-04",
+      "title": "Calendar invite for a Tokyo review",
+      "text": "You're invited: Q1 supplier review\n\nWhen: Thursday 5 March, 09:00–10:30 JST (00:00–01:30 GMT)\nWhere: Nakamura Trading KK, 4-2-8 Shibaura, Minato-ku, Tokyo\nOrganiser: Ngô Thị Minh Hằng <minhhang@halden.example>\n\nAgenda\n1. FY26 volume commitment — ¥840,000,000 framework\n2. Lead-time penalties\n3. Audit visit schedule\n\nDial-in details follow the calendar attachment.",
+      "rationale": "A meeting invitation whose non-ASCII is the Vietnamese diacritics of the organiser's name, a yen figure, and an en dash in the time range, all of it visible.",
+      "source": {
+        "id": "promptdecode-original"
+      }
+    },
+    {
+      "id": "business-correspondence-05",
+      "title": "Legal notice citing sections and trademarks",
+      "text": "NOTICE. Pursuant to § 8 (2) of the distribution agreement dated 3 May 2024, Halden GmbH hereby gives notice that the exclusivity granted for the RotoPak® line in the territory of Österreich and Slovensko shall lapse on 30 June 2026. Nothing in this notice affects accrued payment obligations under §§ 5 and 6. The RotoPak™ mark remains the property of Halden GmbH worldwide.",
+      "rationale": "A contract notice whose section signs, umlauts, ®, and ™ are standard legal typography, and whose only unusual feature is being unusually formal.",
+      "source": {
+        "id": "promptdecode-original"
+      }
+    },
+    {
+      "id": "business-correspondence-06",
+      "title": "Payment reminder with a rupee balance",
+      "text": "Namaste Ms. Iyer,\n\nInvoice HAL-8812 for ₹ 2,45,000 fell due on 28 February and remains unpaid. If the payment is already in transit, please ignore this note and accept our thanks; otherwise we would be grateful for a settlement this week so the March statement matches the ledger.\n\nWarm regards,\nAccounts Receivable, Halden Textiles",
+      "rationale": "A polite payment reminder whose only non-ASCII character is the rupee sign in an amount formatted with Indian digit grouping.",
+      "source": {
+        "id": "promptdecode-original"
+      }
+    },
+    {
+      "id": "business-correspondence-07",
+      "title": "Lab email about sample storage temperatures",
+      "text": "Hi team,\n\nThe enzyme aliquots arrived intact. Split them on arrival: working stock at 4 °C, long-term storage at −20 °C, and the reference standard at −80 °C. Assays run at 37 °C with the α-amylase protocol as before. Label everything with the lot and the date.\n\nThanks,\nPriya (lab 2.14)",
+      "rationale": "Routine lab coordination whose degree signs and minus signs carry storage temperatures and whose α names an enzyme protocol, all visible scientific shorthand.",
+      "source": {
+        "id": "promptdecode-original"
+      }
+    },
+    {
+      "id": "business-correspondence-08",
+      "title": "Minutes naming colleagues with accented initials",
+      "text": "Procurement stand-up, Tuesday\n\nPresent: Zoë Bergström, Émile Roche, Björn Lindqvist, chair.\n- Émile reported that the Zürich depot accepted the revised delivery window.\n- Zoë will send the € 61,300 ceiling memo to finance by Friday.\n- Björn raised the paternity cover for week 12; chair to reallocate audits.\n- Next stand-up as usual, unless the bank holiday moves it.",
+      "rationale": "Internal minutes whose accents belong to the colleagues' names and city, exactly the incidental non-ASCII that real meeting notes carry.",
+      "source": {
+        "id": "promptdecode-original"
+      }
+    },
+    {
+      "id": "business-correspondence-09",
+      "title": "Out-of-office reply in English and Swedish",
+      "text": "Hej!\n\nJag är på semester till den 15 mars med begränsad tillgång till e-post. / I am on annual leave until 15 March with limited access to email.\n\nFor urgent matters concerning the Malmö account, please contact Anna Söderberg (anna.soderberg@halden.example) or call the Stockholm office on +46 8 555 014 22.\n\nMed vänlig hälsning,\nBjörn Andersson",
+      "rationale": "A bilingual out-of-office message whose å, ä, and ö are the ordinary letters of Swedish words and names.",
+      "source": {
+        "id": "promptdecode-original"
+      }
+    },
+    {
+      "id": "business-correspondence-10",
+      "title": "Cover letter addressed to a Müller",
+      "text": "Sehr geehrte Frau Dr. Müller,\n\nI am writing to apply for the metrology post advertised on your careers page. For the past four years I have calibrated the measurement chain at our Graz line — from the 0,1 µm gauge heads to the temperature-controlled laboratory — and I would like to bring that experience to your Zürich laboratory.\n\nI hold a M.Sc. from TU Graz and speak German and English daily.\n\nMit freundlichen Grüßen,\nKatharina Hofer",
+      "rationale": "A job application whose umlauts, eszett, micro sign, and degree sign appear in addresses, units, and greetings, where they belong.",
+      "source": {
+        "id": "promptdecode-original"
+      }
+    },
+    {
+      "id": "business-correspondence-11",
+      "title": "Purchase order confirmation for an Osaka supplier",
+      "text": "PO HDL-26-1187 — confirmation\n\nSupplier: Nakamura Trading KK, Osaka\nValue: ¥ 8,400,000 (CIF Rotterdam)\nLines: 3, as per the attached schedule\nDelivery: week 14, marked for the Koblenz site\nInsurance: covered under the group policy\n\nPlease confirm acceptance by return, and note the packing slip must show the PO number on every carton.",
+      "rationale": "A purchase-order confirmation whose yen sign and en dashes are the document's ordinary commercial notation.",
+      "source": {
+        "id": "promptdecode-original"
+      }
+    },
+    {
+      "id": "business-correspondence-12",
+      "title": "Press release with trademark symbols",
+      "text": "For immediate release\n\nHalden Instruments ships FixPoint™ Suite 4\n\nRotterdam, 2 March — Halden Instruments today released FixPoint™ Suite 4, the newest version of its alignment platform. Existing FixPoint® maintenance subscribers upgrade at no charge, and the FixPoint™ mobile companion ships on both platforms the same week.\n\nPress contact: press@halden.example · © 2026 Halden Instruments B.V.",
+      "rationale": "A press release whose ™, ®, ©, and em dash are exactly the marks corporate communications attach to product names and footers.",
+      "source": {
+        "id": "promptdecode-original"
+      }
+    }
+  ]
+}

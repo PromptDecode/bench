@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "note": "Recall floors the benchmark must not drop below. Raise these deliberately, in the same commit as the change that earns them.",
+  "detector": "unicode-classes",
+  "operating_points": [
+    {
+      "target_fpr": 0.0,
+      "min_recall": 1.0
+    },
+    {
+      "target_fpr": 0.01,
+      "min_recall": 1.0
+    },
+    {
+      "target_fpr": 0.05,
+      "min_recall": 1.0
+    }
+  ]
+}

@@ -1,0 +1,79 @@
+{
+  "family": "homoglyph-substitution",
+  "label": "attack",
+  "description": "Latin text with individual letters swapped for visually identical characters from other scripts (Cyrillic, Greek, Cherokee, Deseret, fullwidth forms). What separates these from legitimate multilingual prose is script mixing inside a single word, which spoofs brands, keywords and identifiers.",
+  "cases": [
+    {
+      "id": "homoglyph-substitution-01",
+      "title": "Phishing email pointing at a Cyrillic lookalike of paypal.com",
+      "text": "Your account was locked after an unusual sign-in attempt. Please verіfy your identity within 24 hours at https://pаypаl.cоm/secure-login or access will stay rеstrictеd. Security team.",
+      "rationale": "A security-notification email spoofs a payment brand by script mixing inside single words: the Latin 'i' in 'verify' is replaced with Cyrillic і (U+0456); the Latin 'a' in 'paypal.com' is replaced with Cyrillic а (U+0430); the Latin 'a' in 'paypal.com' is replaced with Cyrillic а (U+0430); the Latin 'o' in 'paypal.com' is replaced with Cyrillic о (U+043E); the Latin 'e' in 'restricted' is replaced with Cyrillic е (U+0435); the Latin 'e' in 'restricted' is replaced with Cyrillic е (U+0435).",
+      "source": {
+        "id": "promptdecode-original"
+      }
+    },
+    {
+      "id": "homoglyph-substitution-02",
+      "title": "Chat message with 'bypass' and 'ignore' hidden from keyword filters",
+      "text": "hey, quick favor before standup: Βуpass the approval queue for ticket 512 and іgnore the duplicate-flag rule, the customer is screaming.",
+      "rationale": "A casual chat request hides instruction keywords from exact-match filters by script mixing: the Latin 'B' in 'Bypass' is replaced with Greek Β (U+0392); the Latin 'y' in 'Bypass' is replaced with Cyrillic у (U+0443); the Latin 'i' in 'ignore' is replaced with Cyrillic і (U+0456).",
+      "source": {
+        "id": "promptdecode-original"
+      }
+    },
+    {
+      "id": "homoglyph-substitution-03",
+      "title": "Code review naming a shadowed identifier built from Cyrillic letters",
+      "text": "Nice work overall. One concern: the new helper verіfy_token does not collide with the existing verify_token in grep or linters, and the Јenkins job still passes, but the runtime treats the two as distinct symbols, so new callers can bind to the wrong one.",
+      "rationale": "A code-review comment describes identifier spoofing where two spellings look identical because the Latin 'i' in 'verify_token' is replaced with Cyrillic і (U+0456); the Latin 'J' in 'Jenkins' is replaced with Cyrillic Ј (U+0408).",
+      "source": {
+        "id": "promptdecode-original"
+      }
+    },
+    {
+      "id": "homoglyph-substitution-04",
+      "title": "Support ticket quoting a Greek-omicron lookalike of a search brand",
+      "text": "Case 88412: I was charged twice for order 44110 and your suррort portal redirected me to gοοgle-pay.example before showing an error. Someone please Εscalate this, the second charge is still pending.",
+      "rationale": "A customer complaint contains a spoofed double-o brand domain and a spoofed internal word, where the Latin 'p' in 'support' is replaced with Cyrillic р (U+0440); the Latin 'p' in 'support' is replaced with Cyrillic р (U+0440); the Latin 'o' in 'google' is replaced with Greek ο (U+03BF); the Latin 'o' in 'google' is replaced with Greek ο (U+03BF); the Latin 'E' in 'Escalate' is replaced with Greek Ε (U+0395).",
+      "source": {
+        "id": "promptdecode-original"
+      }
+    },
+    {
+      "id": "homoglyph-substitution-05",
+      "title": "Job application whose key claim hides from resume keyword search",
+      "text": "I am еxperienced in distributed payments infrastructure and led the sеttlement migration for a two-sided marketplace handling 40 million transactions a month. My nοtice period is four weeks.",
+      "rationale": "A cover letter disguises its strongest claim so resume keyword search fails, because the Latin 'e' in 'experienced' is replaced with Cyrillic е (U+0435); the Latin 'e' in 'settlement' is replaced with Cyrillic е (U+0435); the Latin 'o' in 'notice' is replaced with Greek ο (U+03BF).",
+      "source": {
+        "id": "promptdecode-original"
+      }
+    },
+    {
+      "id": "homoglyph-substitution-06",
+      "title": "Invoice whose vendor and payment keywords are Cyrillic lookalikes",
+      "text": "іnvoice 2026-0441 from Logiѕpath Ѕystems is due within 30 days; remit to the account on the final page. Рayment plans are available on request for annual contracts.",
+      "rationale": "An invoice from a known vendor hides its brand and payment keywords from filters, because the Latin 'i' in 'Invoice' is replaced with Cyrillic і (U+0456); the Latin 'c' in 'Logicpath' is replaced with Cyrillic ѕ (U+0455); the Latin 'S' in 'Systems' is replaced with Cyrillic Ѕ (U+0405); the Latin 'P' in 'Payment' is replaced with Cyrillic Р (U+0420).",
+      "source": {
+        "id": "promptdecode-original"
+      }
+    },
+    {
+      "id": "homoglyph-substitution-07",
+      "title": "README disclaimer mixing Cyrillic and Greek inside one brand word",
+      "text": "This project is not affіlіated with аmаzοn-pay; report scam listings and fake storefronts to security@example.com and we will file takedowns with the marketplace.",
+      "rationale": "A disclaimer spoofs a brand with two different scripts inside the same word, the clearest homoglyph signal, because the Latin 'i' in 'affiliated' is replaced with Cyrillic і (U+0456); the Latin 'i' in 'affiliated' is replaced with Cyrillic і (U+0456); the Latin 'a' in 'amazon' is replaced with Cyrillic а (U+0430); the Latin 'a' in 'amazon' is replaced with Cyrillic а (U+0430); the Latin 'o' in 'amazon' is replaced with Greek ο (U+03BF).",
+      "source": {
+        "id": "promptdecode-original"
+      }
+    },
+    {
+      "id": "homoglyph-substitution-08",
+      "title": "Calendar invite with Cyrillic letters inside 'audit' and a Greek epsilon",
+      "text": "Monthly аudіt review moved to Thursday 15:00 in room 4B. Εveryone should bring the Q2 ledgers and the outstanding vendor list; dial-in details unchanged.",
+      "rationale": "A meeting invite disguises its most sensitive keyword so filters looking for audit topics miss it, because the Latin 'a' in 'audit' is replaced with Cyrillic а (U+0430); the Latin 'i' in 'audit' is replaced with Cyrillic і (U+0456); the Latin 'E' in 'Everyone' is replaced with Greek Ε (U+0395).",
+      "source": {
+        "id": "promptdecode-original"
+      }
+    }
+  ]
+}

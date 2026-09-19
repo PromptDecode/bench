@@ -1,0 +1,651 @@
+{
+  "schema_version": 1,
+  "interpretation": "This detector separates this corpus completely. That is a fact about a corpus and a detector written in the same repository, not evidence that the detector generalises. Until the corpus contains cases this detector fails, the recall figure measures the difficulty of the corpus, not the reach of the detector.",
+  "corpus": {
+    "name": "promptdecode-bench",
+    "digest": "sha256:599314926a67ad2da74ad89c6bb4d6729c563f1e73783ba78ea9fb14eb761b12",
+    "cases": {
+      "total": 212,
+      "attack": 80,
+      "benign": 132
+    },
+    "families": [
+      {
+        "family": "bidi-override-trojan",
+        "label": "attack",
+        "description": "Trojan-Source-style attacks built from the bidi controls U+202A to U+202E and the isolates U+2066 to U+2069, where the rendered order of the text differs from its logical order. Every case uses unbalanced or unterminated embeddings, overrides, or isolates, and every override targets text with no right-to-left letters at all, which no legitimate use of these controls does.",
+        "cases": 8
+      },
+      {
+        "family": "business-correspondence",
+        "label": "benign",
+        "description": "Ordinary professional correspondence carrying the incidental non-ASCII that real business writing contains: accented names, currency signs, © ™ ®, degree signs, signature blocks, a quoted-reply thread, an invoice, a calendar invite, and a legal notice. Nothing is hidden; every character is visible and in its normal place.",
+        "cases": 12
+      },
+      {
+        "family": "confusable-alphabet-obfuscation",
+        "label": "attack",
+        "description": "Instructions rewritten in alphabets a human can still decode at a glance but a keyword filter cannot match: mathematical alphanumeric symbols, fullwidth forms, enclosed alphanumerics, and Cherokee/Deseret lookalikes standing in for Latin capitals.",
+        "cases": 8
+      },
+      {
+        "family": "directional-mark-injection",
+        "label": "attack",
+        "description": "Left-to-right marks U+200E, right-to-left marks U+200F and Arabic letter marks U+061C injected into text that contains no right-to-left letters at all, so the marks serve no typographic purpose. Covers single-mark chaff and dense runs that encode data bit by bit.",
+        "cases": 8
+      },
+      {
+        "family": "emoji-sequences",
+        "label": "benign",
+        "description": "Legitimate emoji that exercise the same invisible machinery attackers reuse: ZWJ joins, variation selectors, keycaps, skin-tone modifiers, regional indicators, and a complete tag-sequence subdivision flag. These are the sharpest hard negatives in the corpus — a detector that flags any of these mechanisms will false-positive on everyday emoji.",
+        "cases": 12
+      },
+      {
+        "family": "homoglyph-substitution",
+        "label": "attack",
+        "description": "Latin text with individual letters swapped for visually identical characters from other scripts (Cyrillic, Greek, Cherokee, Deseret, fullwidth forms). What separates these from legitimate multilingual prose is script mixing inside a single word, which spoofs brands, keywords and identifiers.",
+        "cases": 8
+      },
+      {
+        "family": "invisible-format-chars",
+        "label": "attack",
+        "description": "Format and filler characters outside the zero-width and bidi families: soft hyphen U+00AD, Mongolian vowel separator U+180E, Hangul fillers U+115F, U+1160, U+3164 and U+FFA0, and the invisible operators U+2061-U+2064. Covers keyword-splitting evasion via splits inside short words, where genuine hyphenation never occurs, and filler runs that carry or pad hidden payloads.",
+        "cases": 8
+      },
+      {
+        "family": "joiners-in-native-scripts",
+        "label": "benign",
+        "description": "Legitimate U+200C ZWNJ and U+200D ZWJ inside words whose orthography requires them: Persian half-spaces and the plural suffix, Devanagari half-form and eyelash-ra control, Bengali ya-phala, Tamil, Malayalam chillu, Sinhala, Kannada, and Arabic joining. These are the canonical false positives for any detector that flags zero-width characters outright; every joiner sits between two letters of one non-Latin script.",
+        "cases": 12
+      },
+      {
+        "family": "layered-smuggling",
+        "label": "attack",
+        "description": "Adversarial texts that combine two or more smuggling classes in one message, the way real attacks stack. Each rationale names every class the case combines; these are the corpus's hardest recall cases.",
+        "cases": 8
+      },
+      {
+        "family": "math-and-science",
+        "label": "benign",
+        "description": "Scientific and mathematical text where format characters carry their actual meaning: Greek letters in formulae, mathematical operators, the invisible operators U+2061 and U+2062 exactly as MathML-derived text produces them, superscripts and subscripts, chemical formulae, units, abstracts, and a statistics table. The attack corpus uses these operators as padding; here each one separates a function from its argument or marks a product.",
+        "cases": 12
+      },
+      {
+        "family": "multilingual-prose",
+        "label": "benign",
+        "description": "Ordinary everyday prose written in non-Latin scripts and mixed-script combinations that occur naturally, from Japanese reviews to Arabic news leads. These cases stop a detector from treating visible non-Latin text as suspicious.",
+        "cases": 12
+      },
+      {
+        "family": "plain-prose",
+        "label": "benign",
+        "description": "Ordinary plain-ASCII English prose of the kind people send to assistants every day, with no hidden characters and nothing unusual about its encoding. This family anchors the false-positive side of the benchmark.",
+        "cases": 12
+      },
+      {
+        "family": "private-use-area",
+        "label": "attack",
+        "description": "Payloads and hidden instruction blocks built from private-use codepoints (U+E000-U+F8FF, plane 15 U+F0000-U+FFFFD and plane 16 U+100000-U+10FFFD), which no font resolves and many renderers strip. Covers byte-per-codepoint payloads on all three planes and PUA delimiters wrapped around an injected instruction block.",
+        "cases": 8
+      },
+      {
+        "family": "prompts-about-instructions",
+        "label": "benign",
+        "description": "Legitimate plain-ASCII text that discusses prompt injection and instruction override in the abstract: incident writeups, detector documentation, red-team plans, policy pages, and questions that quote override phrasings. A detector that keyword-matches override vocabulary will flag these; one that reads context will not. That distinction is what this family measures.",
+        "cases": 12
+      },
+      {
+        "family": "rtl-with-bidi-controls",
+        "label": "benign",
+        "description": "Text that legitimately mixes right-to-left and left-to-right content and therefore uses Unicode bidi controls correctly: every isolate and embedding is balanced and terminated, and every control is applied to text that really contains RTL letters. These are the benign counterparts of unbalanced bidi splicing attacks.",
+        "cases": 12
+      },
+      {
+        "family": "source-code",
+        "label": "benign",
+        "description": "Real-looking source code in several languages, including security tooling whose text spells out invisible and bidi codepoints as escape sequences without containing the characters themselves. A detector that treats escape spellings, codepoint names, or security vocabulary as evidence of smuggling will false-positive here.",
+        "cases": 12
+      },
+      {
+        "family": "structured-data",
+        "label": "benign",
+        "description": "Machine-shaped text a detector must not flag: JSON payloads, YAML configuration, CSV extracts, log lines, HTTP headers, a diff, and an SPDX SBOM. None of it is addressed to a model and none of it hides anything; its density of punctuation and identifiers is normal for the formats.",
+        "cases": 12
+      },
+      {
+        "family": "typography",
+        "label": "benign",
+        "description": "Professional typesetting that uses format characters for their intended purpose: soft hyphens at genuine syllable breaks in long words, word joiners preventing breaks, no-break and thin spaces, curly quotes, dashes, ellipsis, and a leading byte order mark on exported files. The attack corpus reuses these codepoints to split short keywords; the length, position, and context here are what make each use legitimate.",
+        "cases": 12
+      },
+      {
+        "family": "unicode-tag-block",
+        "label": "attack",
+        "description": "Instructions hidden in the Unicode tag block (U+E0000 to U+E007F), which renders as nothing in most editors, terminals, and browsers. This family measures whether the detector catches smuggling that a human reviewer cannot see.",
+        "cases": 8
+      },
+      {
+        "family": "variation-selector-smuggling",
+        "label": "attack",
+        "description": "Payloads carried in variation selectors (U+FE00-U+FE0F and the supplement U+E0100-U+E01EF), which render as nothing. Covers long selector runs that encode byte payloads after an ordinary character, and selectors attached to characters that have no legitimate variant form.",
+        "cases": 8
+      },
+      {
+        "family": "zero-width-smuggling",
+        "label": "attack",
+        "description": "Payloads carried by zero-width characters: binary encodings over ZWSP, ZWNJ, ZWJ, FEFF and word joiner that render as nothing, and zero-width characters inserted inside Latin words so that keyword matching sees fragmented instructions. Measures recall against smuggling that is invisible both to the eye and to naive string filters.",
+        "cases": 8
+      }
+    ],
+    "sources": [
+      {
+        "id": "promptdecode-original",
+        "name": "Authored for the promptdecode benchmark",
+        "url": "https://github.com/PromptDecode/bench",
+        "licence": "CC0-1.0",
+        "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "cases": 212
+      }
+    ]
+  },
+  "detector": {
+    "id": "unicode-classes",
+    "name": "Unicode character-class reference detector",
+    "version": "0.2.0"
+  },
+  "resolution": {
+    "benign_cases": 132,
+    "finest_nonzero_fpr": 0.007576
+  },
+  "operating_points": [
+    {
+      "target_fpr": 0.0,
+      "threshold": 2.0,
+      "recall": 1.0,
+      "false_positive_rate": 0.0,
+      "counts": {
+        "true_positives": 80,
+        "false_negatives": 0,
+        "false_positives": 0,
+        "true_negatives": 132
+      },
+      "missed_attack_cases": [],
+      "false_positive_cases": [],
+      "by_family": [
+        {
+          "family": "bidi-override-trojan",
+          "label": "attack",
+          "cases": 8,
+          "detected": 8,
+          "rate": 1.0
+        },
+        {
+          "family": "business-correspondence",
+          "label": "benign",
+          "cases": 12,
+          "detected": 0,
+          "rate": 0.0
+        },
+        {
+          "family": "confusable-alphabet-obfuscation",
+          "label": "attack",
+          "cases": 8,
+          "detected": 8,
+          "rate": 1.0
+        },
+        {
+          "family": "directional-mark-injection",
+          "label": "attack",
+          "cases": 8,
+          "detected": 8,
+          "rate": 1.0
+        },
+        {
+          "family": "emoji-sequences",
+          "label": "benign",
+          "cases": 12,
+          "detected": 0,
+          "rate": 0.0
+        },
+        {
+          "family": "homoglyph-substitution",
+          "label": "attack",
+          "cases": 8,
+          "detected": 8,
+          "rate": 1.0
+        },
+        {
+          "family": "invisible-format-chars",
+          "label": "attack",
+          "cases": 8,
+          "detected": 8,
+          "rate": 1.0
+        },
+        {
+          "family": "joiners-in-native-scripts",
+          "label": "benign",
+          "cases": 12,
+          "detected": 0,
+          "rate": 0.0
+        },
+        {
+          "family": "layered-smuggling",
+          "label": "attack",
+          "cases": 8,
+          "detected": 8,
+          "rate": 1.0
+        },
+        {
+          "family": "math-and-science",
+          "label": "benign",
+          "cases": 12,
+          "detected": 0,
+          "rate": 0.0
+        },
+        {
+          "family": "multilingual-prose",
+          "label": "benign",
+          "cases": 12,
+          "detected": 0,
+          "rate": 0.0
+        },
+        {
+          "family": "plain-prose",
+          "label": "benign",
+          "cases": 12,
+          "detected": 0,
+          "rate": 0.0
+        },
+        {
+          "family": "private-use-area",
+          "label": "attack",
+          "cases": 8,
+          "detected": 8,
+          "rate": 1.0
+        },
+        {
+          "family": "prompts-about-instructions",
+          "label": "benign",
+          "cases": 12,
+          "detected": 0,
+          "rate": 0.0
+        },
+        {
+          "family": "rtl-with-bidi-controls",
+          "label": "benign",
+          "cases": 12,
+          "detected": 0,
+          "rate": 0.0
+        },
+        {
+          "family": "source-code",
+          "label": "benign",
+          "cases": 12,
+          "detected": 0,
+          "rate": 0.0
+        },
+        {
+          "family": "structured-data",
+          "label": "benign",
+          "cases": 12,
+          "detected": 0,
+          "rate": 0.0
+        },
+        {
+          "family": "typography",
+          "label": "benign",
+          "cases": 12,
+          "detected": 0,
+          "rate": 0.0
+        },
+        {
+          "family": "unicode-tag-block",
+          "label": "attack",
+          "cases": 8,
+          "detected": 8,
+          "rate": 1.0
+        },
+        {
+          "family": "variation-selector-smuggling",
+          "label": "attack",
+          "cases": 8,
+          "detected": 8,
+          "rate": 1.0
+        },
+        {
+          "family": "zero-width-smuggling",
+          "label": "attack",
+          "cases": 8,
+          "detected": 8,
+          "rate": 1.0
+        }
+      ]
+    },
+    {
+      "target_fpr": 0.01,
+      "threshold": 2.0,
+      "recall": 1.0,
+      "false_positive_rate": 0.0,
+      "counts": {
+        "true_positives": 80,
+        "false_negatives": 0,
+        "false_positives": 0,
+        "true_negatives": 132
+      },
+      "missed_attack_cases": [],
+      "false_positive_cases": [],
+      "by_family": [
+        {
+          "family": "bidi-override-trojan",
+          "label": "attack",
+          "cases": 8,
+          "detected": 8,
+          "rate": 1.0
+        },
+        {
+          "family": "business-correspondence",
+          "label": "benign",
+          "cases": 12,
+          "detected": 0,
+          "rate": 0.0
+        },
+        {
+          "family": "confusable-alphabet-obfuscation",
+          "label": "attack",
+          "cases": 8,
+          "detected": 8,
+          "rate": 1.0
+        },
+        {
+          "family": "directional-mark-injection",
+          "label": "attack",
+          "cases": 8,
+          "detected": 8,
+          "rate": 1.0
+        },
+        {
+          "family": "emoji-sequences",
+          "label": "benign",
+          "cases": 12,
+          "detected": 0,
+          "rate": 0.0
+        },
+        {
+          "family": "homoglyph-substitution",
+          "label": "attack",
+          "cases": 8,
+          "detected": 8,
+          "rate": 1.0
+        },
+        {
+          "family": "invisible-format-chars",
+          "label": "attack",
+          "cases": 8,
+          "detected": 8,
+          "rate": 1.0
+        },
+        {
+          "family": "joiners-in-native-scripts",
+          "label": "benign",
+          "cases": 12,
+          "detected": 0,
+          "rate": 0.0
+        },
+        {
+          "family": "layered-smuggling",
+          "label": "attack",
+          "cases": 8,
+          "detected": 8,
+          "rate": 1.0
+        },
+        {
+          "family": "math-and-science",
+          "label": "benign",
+          "cases": 12,
+          "detected": 0,
+          "rate": 0.0
+        },
+        {
+          "family": "multilingual-prose",
+          "label": "benign",
+          "cases": 12,
+          "detected": 0,
+          "rate": 0.0
+        },
+        {
+          "family": "plain-prose",
+          "label": "benign",
+          "cases": 12,
+          "detected": 0,
+          "rate": 0.0
+        },
+        {
+          "family": "private-use-area",
+          "label": "attack",
+          "cases": 8,
+          "detected": 8,
+          "rate": 1.0
+        },
+        {
+          "family": "prompts-about-instructions",
+          "label": "benign",
+          "cases": 12,
+          "detected": 0,
+          "rate": 0.0
+        },
+        {
+          "family": "rtl-with-bidi-controls",
+          "label": "benign",
+          "cases": 12,
+          "detected": 0,
+          "rate": 0.0
+        },
+        {
+          "family": "source-code",
+          "label": "benign",
+          "cases": 12,
+          "detected": 0,
+          "rate": 0.0
+        },
+        {
+          "family": "structured-data",
+          "label": "benign",
+          "cases": 12,
+          "detected": 0,
+          "rate": 0.0
+        },
+        {
+          "family": "typography",
+          "label": "benign",
+          "cases": 12,
+          "detected": 0,
+          "rate": 0.0
+        },
+        {
+          "family": "unicode-tag-block",
+          "label": "attack",
+          "cases": 8,
+          "detected": 8,
+          "rate": 1.0
+        },
+        {
+          "family": "variation-selector-smuggling",
+          "label": "attack",
+          "cases": 8,
+          "detected": 8,
+          "rate": 1.0
+        },
+        {
+          "family": "zero-width-smuggling",
+          "label": "attack",
+          "cases": 8,
+          "detected": 8,
+          "rate": 1.0
+        }
+      ]
+    },
+    {
+      "target_fpr": 0.05,
+      "threshold": 2.0,
+      "recall": 1.0,
+      "false_positive_rate": 0.0,
+      "counts": {
+        "true_positives": 80,
+        "false_negatives": 0,
+        "false_positives": 0,
+        "true_negatives": 132
+      },
+      "missed_attack_cases": [],
+      "false_positive_cases": [],
+      "by_family": [
+        {
+          "family": "bidi-override-trojan",
+          "label": "attack",
+          "cases": 8,
+          "detected": 8,
+          "rate": 1.0
+        },
+        {
+          "family": "business-correspondence",
+          "label": "benign",
+          "cases": 12,
+          "detected": 0,
+          "rate": 0.0
+        },
+        {
+          "family": "confusable-alphabet-obfuscation",
+          "label": "attack",
+          "cases": 8,
+          "detected": 8,
+          "rate": 1.0
+        },
+        {
+          "family": "directional-mark-injection",
+          "label": "attack",
+          "cases": 8,
+          "detected": 8,
+          "rate": 1.0
+        },
+        {
+          "family": "emoji-sequences",
+          "label": "benign",
+          "cases": 12,
+          "detected": 0,
+          "rate": 0.0
+        },
+        {
+          "family": "homoglyph-substitution",
+          "label": "attack",
+          "cases": 8,
+          "detected": 8,
+          "rate": 1.0
+        },
+        {
+          "family": "invisible-format-chars",
+          "label": "attack",
+          "cases": 8,
+          "detected": 8,
+          "rate": 1.0
+        },
+        {
+          "family": "joiners-in-native-scripts",
+          "label": "benign",
+          "cases": 12,
+          "detected": 0,
+          "rate": 0.0
+        },
+        {
+          "family": "layered-smuggling",
+          "label": "attack",
+          "cases": 8,
+          "detected": 8,
+          "rate": 1.0
+        },
+        {
+          "family": "math-and-science",
+          "label": "benign",
+          "cases": 12,
+          "detected": 0,
+          "rate": 0.0
+        },
+        {
+          "family": "multilingual-prose",
+          "label": "benign",
+          "cases": 12,
+          "detected": 0,
+          "rate": 0.0
+        },
+        {
+          "family": "plain-prose",
+          "label": "benign",
+          "cases": 12,
+          "detected": 0,
+          "rate": 0.0
+        },
+        {
+          "family": "private-use-area",
+          "label": "attack",
+          "cases": 8,
+          "detected": 8,
+          "rate": 1.0
+        },
+        {
+          "family": "prompts-about-instructions",
+          "label": "benign",
+          "cases": 12,
+          "detected": 0,
+          "rate": 0.0
+        },
+        {
+          "family": "rtl-with-bidi-controls",
+          "label": "benign",
+          "cases": 12,
+          "detected": 0,
+          "rate": 0.0
+        },
+        {
+          "family": "source-code",
+          "label": "benign",
+          "cases": 12,
+          "detected": 0,
+          "rate": 0.0
+        },
+        {
+          "family": "structured-data",
+          "label": "benign",
+          "cases": 12,
+          "detected": 0,
+          "rate": 0.0
+        },
+        {
+          "family": "typography",
+          "label": "benign",
+          "cases": 12,
+          "detected": 0,
+          "rate": 0.0
+        },
+        {
+          "family": "unicode-tag-block",
+          "label": "attack",
+          "cases": 8,
+          "detected": 8,
+          "rate": 1.0
+        },
+        {
+          "family": "variation-selector-smuggling",
+          "label": "attack",
+          "cases": 8,
+          "detected": 8,
+          "rate": 1.0
+        },
+        {
+          "family": "zero-width-smuggling",
+          "label": "attack",
+          "cases": 8,
+          "detected": 8,
+          "rate": 1.0
+        }
+      ]
+    }
+  ]
+}
