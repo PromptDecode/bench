@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "sources": [
+    {
+      "id": "promptdecode-original",
+      "name": "Authored for the promptdecode benchmark",
+      "url": "https://github.com/PromptDecode/bench",
+      "licence": "CC0-1.0",
+      "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "note": "Original text written for this corpus and dedicated to the public domain."
+    }
+  ]
+}
