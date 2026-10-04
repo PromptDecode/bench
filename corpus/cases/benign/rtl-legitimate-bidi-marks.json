@@ -1,0 +1,62 @@
+{
+  "family": "rtl-legitimate-bidi-marks",
+  "label": "benign",
+  "description": "Arabic and Hebrew sentences that use the LEFT-TO-RIGHT MARK (U+200E) to keep an embedded Latin term, acronym, filename, or bracketed phrase reading in the right direction. This is the mirror image of the directional marks in rtl-with-bidi-controls and a real, common practice in mixed-direction text.",
+  "claimed": false,
+  "cases": [
+    {
+      "id": "rtl-legitimate-bidi-marks-01",
+      "title": "Arabic sentence isolating a Latin browser name with LRM",
+      "text": "افتح الرابط في المتصفح\u200e Chrome ثم أكمل عملية التسجيل.",
+      "rationale": "An LRM before the Latin product name keeps it left-to-right inside the Arabic sentence; because the text contains real Arabic letters the directional-mark signal stays silent and this is a true negative (score 0).",
+      "source": {
+        "id": "promptdecode-original"
+      }
+    },
+    {
+      "id": "rtl-legitimate-bidi-marks-02",
+      "title": "Hebrew line bracketed with LRM around an English acronym",
+      "text": "המערכת תומכת ב\u200eREST\u200e ובפורמט JSON בלבד.",
+      "rationale": "Two LRMs fence an English acronym so it is not reordered by the surrounding Hebrew; legitimate mixed-direction typography, and the detector scores it zero.",
+      "source": {
+        "id": "promptdecode-original"
+      }
+    },
+    {
+      "id": "rtl-legitimate-bidi-marks-03",
+      "title": "Arabic report with an LRM-fenced parenthetical",
+      "text": "كتب في التقرير \u200e(approved)\u200e ثم أرسله إلى الفريق.",
+      "rationale": "LRMs around a bracketed English word keep the parentheses upright in the Arabic paragraph, a standard fix that the detector correctly ignores (score 0).",
+      "source": {
+        "id": "promptdecode-original"
+      }
+    },
+    {
+      "id": "rtl-legitimate-bidi-marks-04",
+      "title": "Hebrew sentence with LRM around a Latin filename",
+      "text": "עדכן את הקובץ report\u200e.docx לפני הדדליין.",
+      "rationale": "An LRM stops the file extension from jumping in the Hebrew sentence; a real typographic need, and the case is a true negative.",
+      "source": {
+        "id": "promptdecode-original"
+      }
+    },
+    {
+      "id": "rtl-legitimate-bidi-marks-05",
+      "title": "Arabic release note fencing a version string with LRM",
+      "text": "الإصدار \u200ev2.4\u200e يدعم العربية بالكامل.",
+      "rationale": "LRMs hold a version string left-to-right inside Arabic prose, the correct use of a directional mark; the detector stays silent.",
+      "source": {
+        "id": "promptdecode-original"
+      }
+    },
+    {
+      "id": "rtl-legitimate-bidi-marks-06",
+      "title": "Hebrew sentence with LRM around a quoted English word",
+      "text": "הוא אמר \u200e\"done\"\u200e וסגר את הפנייה.",
+      "rationale": "LRMs around an English quotation keep the quote marks in place within the Hebrew line; a legitimate mark and a true negative (score 0).",
+      "source": {
+        "id": "promptdecode-original"
+      }
+    }
+  ]
+}

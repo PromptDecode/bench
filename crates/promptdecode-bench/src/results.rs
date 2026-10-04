@@ -17,6 +17,8 @@
 //! on nothing at all to meet the target FPR" (an infinite threshold — JSON
 //! has no infinity literal).
 
+use std::collections::HashSet;
+
 use serde::{Deserialize, Serialize};
 
 use crate::corpus::{Corpus, Label};
@@ -37,7 +39,7 @@ pub const CORPUS_NAME: &str = "promptdecode-bench";
 /// and its ethos is to never publish a bare effectiveness percentage — so the
 /// caveat is part of the artefact itself and cannot be separated from the
 /// number it qualifies.
-pub const INTERPRETATION: &str = "This detector separates this corpus completely. That is a fact about a corpus and a detector written in the same repository, not evidence that the detector generalises. Until the corpus contains cases this detector fails, the recall figure measures the difficulty of the corpus, not the reach of the detector.";
+pub const INTERPRETATION: &str = "This detector separates the claimed corpus completely, and that is the only scope the CI gate reads: `operating_points` covers just the families the benchmark claims, and there recall is 1.0 with zero false positives. The unclaimed families beside them document the rest of the picture. The detector misses whole classes of attacks that carry no Unicode-class signal - instructions hidden in HTML comments, markdown link titles, and CSS-invisible spans, base64 and rot13 payloads, homoglyph instructions whose every letter is substituted, and zero-width steganography placed only at word boundaries - and it raises false positives on legitimate CJK ideographic variation sequences. `full_corpus_operating_points` reports the unrestricted result over every family, and there recall falls well short of 1.0 at the strict false-positive targets. All of this remains a fact about a corpus and a detector written in the same repository, not evidence that the detector generalises.";
 
 /// The complete results document.
 #[derive(Debug, Clone, Serialize)]
@@ -52,8 +54,16 @@ pub struct ResultsReport {
     pub detector: DetectorSection,
     /// How fine a false-positive rate this corpus can resolve.
     pub resolution: Resolution,
-    /// One entry per target FPR, ascending.
+    /// One entry per target FPR, ascending, over the **claimed** families
+    /// only. This is the list the baseline recall gate applies to: the gate
+    /// covers exactly the families the benchmark claims to handle.
     pub operating_points: Vec<OperatingPoint>,
+    /// One entry per target FPR, ascending, over the **full** corpus —
+    /// claimed and unclaimed families alike. Reported for transparency only;
+    /// it is not gated. While every family is claimed this is identical to
+    /// `operating_points`, and it diverges only once an unclaimed family is
+    /// added.
+    pub full_corpus_operating_points: Vec<OperatingPoint>,
 }
 
 /// The corpus half of the results document.
@@ -89,6 +99,10 @@ pub struct FamilySummary {
     pub family: String,
     /// The family's label.
     pub label: Label,
+    /// Whether the benchmark claims this family is handled correctly (see
+    /// `corpus::Family::claimed`). The baseline gate covers only claimed
+    /// families.
+    pub claimed: bool,
     /// The family's description, verbatim from the family file.
     pub description: String,
     /// Number of cases in the family.
@@ -139,6 +153,7 @@ pub fn build_report(
         .map(|f| FamilySummary {
             family: f.family.clone(),
             label: f.label,
+            claimed: f.claimed,
             description: f.description.clone(),
             cases: f.cases.len(),
         })
@@ -158,6 +173,22 @@ pub fn build_report(
         })
         .collect();
     sources.sort_by(|a, b| a.id.cmp(&b.id));
+
+    // The baseline recall gate covers only the families the benchmark claims:
+    // `operating_points` is computed over the claimed subset, while
+    // `full_corpus_operating_points` covers every family for transparency.
+    // With every family claimed (the current corpus) the two are identical.
+    let claimed: HashSet<&str> = corpus
+        .families
+        .iter()
+        .filter(|f| f.claimed)
+        .map(|f| f.family.as_str())
+        .collect();
+    let claimed_scored: Vec<ScoredCase> = scored
+        .iter()
+        .filter(|c| claimed.contains(c.family.as_str()))
+        .cloned()
+        .collect();
 
     ResultsReport {
         schema_version: RESULTS_SCHEMA_VERSION,
@@ -179,7 +210,8 @@ pub fn build_report(
             version: detector.version().to_string(),
         },
         resolution: resolution(scored),
-        operating_points: all_operating_points(scored),
+        operating_points: all_operating_points(&claimed_scored),
+        full_corpus_operating_points: all_operating_points(scored),
     }
 }
 
@@ -302,8 +334,9 @@ mod tests {
         let json = render(&report).unwrap();
         assert!(json.ends_with("}\n"));
         // Field order: schema_version first, interpretation immediately after
-        // it, operating_points last; counts in contract order inside every
-        // operating point.
+        // it, operating_points (the claimed-scoped, gated list) then
+        // full_corpus_operating_points last; counts in contract order inside
+        // every operating point.
         assert!(json.contains("\"schema_version\": 1"));
         let schema_pos = json.find("\"schema_version\"").unwrap();
         let interpretation_pos = json.find("\"interpretation\"").unwrap();
@@ -311,9 +344,14 @@ mod tests {
         let detector_pos = json.find("\"detector\"").unwrap();
         let resolution_pos = json.find("\"resolution\"").unwrap();
         let ops_pos = json.find("\"operating_points\"").unwrap();
+        let full_ops_pos = json.find("\"full_corpus_operating_points\"").unwrap();
         assert!(schema_pos < interpretation_pos && interpretation_pos < corpus_pos);
         assert!(corpus_pos < detector_pos);
         assert!(detector_pos < resolution_pos && resolution_pos < ops_pos);
+        assert!(
+            ops_pos < full_ops_pos,
+            "the claimed-scoped operating points must precede the full-corpus ones"
+        );
         let counts_pos = json.find("\"counts\"").unwrap();
         let tp = json.find("\"true_positives\"").unwrap();
         let fneg = json.find("\"false_negatives\"").unwrap();
@@ -330,6 +368,114 @@ mod tests {
         let rendered = value["interpretation"].as_str().unwrap_or_default();
         assert!(!rendered.is_empty(), "interpretation must be non-empty");
         assert_eq!(rendered, INTERPRETATION);
+    }
+
+    #[test]
+    fn operating_points_are_scoped_to_claimed_families() {
+        use crate::detector::UnicodeClasses;
+        use crate::metrics::score_corpus;
+
+        // A three-family corpus on disk: one claimed attack family, one
+        // unclaimed attack family, one benign family.
+        let dir = std::env::temp_dir().join(format!(
+            "promptdecode-bench-claimed-scope-{}",
+            std::process::id()
+        ));
+        let _ = std::fs::remove_dir_all(&dir);
+        std::fs::create_dir_all(dir.join("cases/attack")).unwrap();
+        std::fs::create_dir_all(dir.join("cases/benign")).unwrap();
+        std::fs::write(
+            dir.join("sources.json"),
+            r#"{
+  "schema_version": 1,
+  "sources": [
+    { "id": "s", "name": "n", "licence": "CC0-1.0", "licence_url": "https://x" }
+  ]
+}"#,
+        )
+        .unwrap();
+        let case = |id: &str, text: &str| {
+            format!(
+                r#"{{ "id": "{id}", "title": "t", "text": "{text}", "rationale": "r", "source": {{ "id": "s" }} }}"#
+            )
+        };
+        let family = |family: &str, label: &str, claimed: bool, cases: &str| {
+            format!(
+                r#"{{ "family": "{family}", "label": "{label}", "description": "d", "claimed": {claimed}, "cases": [{cases}] }}"#
+            )
+        };
+        std::fs::write(
+            dir.join("cases/attack/claimed-attack.json"),
+            family(
+                "claimed-attack",
+                "attack",
+                true,
+                &case("claimed-attack-01", "hidden\\u200Bdir"),
+            ),
+        )
+        .unwrap();
+        std::fs::write(
+            dir.join("cases/attack/unclaimed-attack.json"),
+            family(
+                "unclaimed-attack",
+                "attack",
+                false,
+                &case("unclaimed-attack-01", "plain"),
+            ),
+        )
+        .unwrap();
+        std::fs::write(
+            dir.join("cases/benign/benign-plain.json"),
+            family(
+                "benign-plain",
+                "benign",
+                true,
+                &case("benign-plain-01", "plain benign"),
+            ),
+        )
+        .unwrap();
+
+        let corpus = Corpus::load(&dir).unwrap();
+        let detector = UnicodeClasses;
+        let scored = score_corpus(&corpus, &detector);
+        let report = build_report(&corpus, &detector, &scored);
+
+        // The gated list covers only the claimed families: the unclaimed
+        // attack family never appears, and its cases never count.
+        let claimed_families: Vec<&str> = report.operating_points[0]
+            .by_family
+            .iter()
+            .map(|f| f.family.as_str())
+            .collect();
+        assert_eq!(claimed_families, vec!["benign-plain", "claimed-attack"]);
+        let claimed_attack = report.operating_points[0].counts.true_positives
+            + report.operating_points[0].counts.false_negatives;
+        assert_eq!(claimed_attack, 1);
+
+        // The full-corpus list covers everything, unclaimed families included.
+        let full_families: Vec<&str> = report.full_corpus_operating_points[0]
+            .by_family
+            .iter()
+            .map(|f| f.family.as_str())
+            .collect();
+        assert_eq!(
+            full_families,
+            vec!["benign-plain", "claimed-attack", "unclaimed-attack"]
+        );
+        let full_attack = report.full_corpus_operating_points[0].counts.true_positives
+            + report.full_corpus_operating_points[0]
+                .counts
+                .false_negatives;
+        assert_eq!(full_attack, 2);
+
+        // Every claimed family is reported as claimed in the corpus section.
+        let unclaimed = report
+            .corpus
+            .families
+            .iter()
+            .find(|f| f.family == "unclaimed-attack")
+            .unwrap();
+        assert!(!unclaimed.claimed);
     }
 
     #[test]
@@ -389,6 +535,7 @@ mod tests {
                 families: vec![FamilySummary {
                     family: "fam-a".to_string(),
                     label: Label::Attack,
+                    claimed: true,
                     description: "d".to_string(),
                     cases: 2,
                 }],
@@ -403,7 +550,8 @@ mod tests {
                 benign_cases: 2,
                 finest_nonzero_fpr: 0.5,
             },
-            operating_points: ops,
+            operating_points: ops.clone(),
+            full_corpus_operating_points: ops,
         }
     }
 }

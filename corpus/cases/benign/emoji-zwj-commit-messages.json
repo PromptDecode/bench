@@ -1,0 +1,71 @@
+{
+  "family": "emoji-zwj-commit-messages",
+  "label": "benign",
+  "description": "Realistic git commit messages whose subjects and bodies contain emoji ZWJ sequences. The joiners sit between emoji codepoints, never between two Latin letters, and never form a run of three, so every case is expected to be a true negative while exercising the same invisible machinery attackers reuse.",
+  "claimed": false,
+  "cases": [
+    {
+      "id": "emoji-zwj-commit-messages-01",
+      "title": "Feature commit naming a technologist emoji",
+      "text": "feat: add 🧑\u200d💻 pairing flow for remote interviews",
+      "rationale": "The subject uses the standard person-at-computer ZWJ sequence; the single U+200D sits between two emoji, so zero-width-in-word and zero-width-run are both silent and the case scores zero.",
+      "source": {
+        "id": "promptdecode-original"
+      }
+    },
+    {
+      "id": "emoji-zwj-commit-messages-02",
+      "title": "Fix commit about an overlapping health-worker badge",
+      "text": "fix: stop the 👩\u200d⚕\ufe0f badge from overlapping on small screens",
+      "rationale": "A profession emoji built from a ZWJ and a VS16, both standard; the VS16 follows an allowlisted symbol base, so variation-selector-anomaly does not fire and the case is a true negative.",
+      "source": {
+        "id": "promptdecode-original"
+      }
+    },
+    {
+      "id": "emoji-zwj-commit-messages-03",
+      "title": "Chore commit bumping two joined flags",
+      "text": "chore: bump deps 🏳\ufe0f\u200d🌈 and 🏳\ufe0f\u200d⚧\ufe0f",
+      "rationale": "Each flag is a base plus VS16 plus ZWJ plus a second emoji; the VS16 and ZWJ are adjacent but form a run of two, below the threshold, and both follow emoji bases, so no signal fires.",
+      "source": {
+        "id": "promptdecode-original"
+      }
+    },
+    {
+      "id": "emoji-zwj-commit-messages-04",
+      "title": "Docs commit using the family emoji",
+      "text": "docs: 👨\u200d👩\u200d👧\u200d👦 example for family accounts",
+      "rationale": "Three single ZWJs between four emoji make the family glyph; each joiner is isolated from the next by a visible emoji, so no run and no letter-adjacency arise.",
+      "source": {
+        "id": "promptdecode-original"
+      }
+    },
+    {
+      "id": "emoji-zwj-commit-messages-05",
+      "title": "Refactor commit naming a people-holding-hands emoji",
+      "text": "refactor: 🧑\u200d🤝\u200d🧑 extract the shared retry helper",
+      "rationale": "Two ZWJs joined around a visible handshake emoji; the joiners are separated by visible codepoints, so the commit subject is a clean true negative.",
+      "source": {
+        "id": "promptdecode-original"
+      }
+    },
+    {
+      "id": "emoji-zwj-commit-messages-06",
+      "title": "i18n commit adding locales and a two-tone handshake",
+      "text": "i18n: add 🇯🇵 and 🇧🇷 locale stubs for the 🫱🏻\u200d🫲🏿 handshake copy",
+      "rationale": "Regional-indicator flags and a multi-tone ZWJ handshake are all standard emoji; the only invisible codepoint is one isolated ZWJ, so the case scores zero.",
+      "source": {
+        "id": "promptdecode-original"
+      }
+    },
+    {
+      "id": "emoji-zwj-commit-messages-07",
+      "title": "Test commit covering couple-with-heart renderings",
+      "text": "test: cover 👩\u200d❤\ufe0f\u200d👨 and 👩\u200d❤\ufe0f\u200d💋\u200d👨 renderings",
+      "rationale": "Couple emoji use VS16 plus ZWJ pairs after the heart; the runs are two long, the VS16 follows an allowlisted heart base, and the sequences are ordinary, giving a true negative.",
+      "source": {
+        "id": "promptdecode-original"
+      }
+    }
+  ]
+}

@@ -81,8 +81,25 @@ pub struct Family {
     pub label: Label,
     /// One or two sentences on what this family is and why it belongs.
     pub description: String,
+    /// Whether the benchmark claims this family is handled correctly: for an
+    /// attack family, that the detector reliably detects it; for a benign
+    /// family, that it presents a clean false-positive profile. The baseline
+    /// recall/FPR gate (`baseline.json`) applies only to claimed families;
+    /// unclaimed families are still scored and reported in full, just not
+    /// gated. Defaults to `true`, so a family file that omits the field
+    /// claims its family, and every pre-existing family file keeps its
+    /// meaning unchanged.
+    #[serde(default = "default_claimed")]
+    pub claimed: bool,
     /// The cases; required to be non-empty.
     pub cases: Vec<Case>,
+}
+
+/// The default for [`Family::claimed`]: a family is claimed unless it says
+/// otherwise, so omitting the field never silently drops a family out of the
+/// baseline gate.
+fn default_claimed() -> bool {
+    true
 }
 
 /// A source-registry entry from `sources.json`.
@@ -660,6 +677,37 @@ mod tests {
         // Digest is stable across loads of the same bytes.
         assert_eq!(corpus.digest(), Corpus::load(&dir).unwrap().digest());
         assert!(corpus.digest().starts_with("sha256:"));
+    }
+
+    #[test]
+    fn claimed_defaults_to_true_and_an_explicit_false_is_honoured() {
+        // Omitted `claimed` parses as `true`, so pre-existing family files
+        // (which never mention it) keep claiming their families.
+        let default_dir = fixture(
+            "claimed-default",
+            &[(
+                "attack/plain-family.json",
+                &family_json("plain-family", "attack", &case_json("plain-family-01", "x")),
+            )],
+        );
+        assert!(Corpus::load(&default_dir).unwrap().families[0].claimed);
+
+        // An explicit `false` is a real value, not a truthy string.
+        let unclaimed = format!(
+            r#"{{
+  "family": "unclaimed-family",
+  "label": "attack",
+  "description": "Documented but not gated.",
+  "claimed": false,
+  "cases": [{}]
+}}"#,
+            case_json("unclaimed-family-01", "x")
+        );
+        let false_dir = fixture(
+            "claimed-false",
+            &[("attack/unclaimed-family.json", &unclaimed)],
+        );
+        assert!(!Corpus::load(&false_dir).unwrap().families[0].claimed);
     }
 
     #[test]

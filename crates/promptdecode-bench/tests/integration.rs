@@ -68,12 +68,15 @@ fn recomputed_results_match_committed_results_json() {
     );
 }
 
-/// Sanity of the numbers: the detector under test should separate this
-/// corpus at least at the loosest target FPR, and the resolution block must
-/// agree with the benign count. Kept loose on purpose — it guards against a
-/// harness wiring mistake, not against honest detector weakness.
+/// Sanity of the numbers: the claimed-scoped operating points must cover the
+/// claimed families, the full-corpus operating points must cover everything,
+/// and the resolution block must agree with the benign count. Kept loose on
+/// purpose — it guards against a harness wiring mistake, not against honest
+/// detector weakness.
 #[test]
 fn operating_points_are_wellformed() {
+    use std::collections::HashSet;
+
     let corpus = Corpus::load(&corpus_dir()).expect("committed corpus must validate");
     let detector = UnicodeClasses;
     let scored = score_corpus(&corpus, &detector);
@@ -90,6 +93,30 @@ fn operating_points_are_wellformed() {
     let res = resolution(&scored);
     assert_eq!(res.benign_cases, report.resolution.benign_cases);
 
+    // The gated `operating_points` cover only the claimed families; the
+    // full-corpus list covers every family. Both must be internally
+    // consistent with the cases they actually cover.
+    let claimed_families: HashSet<&str> = corpus
+        .families
+        .iter()
+        .filter(|f| f.claimed)
+        .map(|f| f.family.as_str())
+        .collect();
+    let claimed_attack = scored
+        .iter()
+        .filter(|c| c.label == promptdecode_bench::Label::Attack)
+        .filter(|c| claimed_families.contains(c.family.as_str()))
+        .count();
+    let claimed_benign = scored
+        .iter()
+        .filter(|c| c.label == promptdecode_bench::Label::Benign)
+        .filter(|c| claimed_families.contains(c.family.as_str()))
+        .count();
+    assert!(
+        claimed_attack < report.corpus.cases.attack,
+        "the committed corpus is expected to contain at least one unclaimed attack family"
+    );
+
     let targets: Vec<f64> = report
         .operating_points
         .iter()
@@ -97,7 +124,24 @@ fn operating_points_are_wellformed() {
         .collect();
     assert_eq!(targets, vec![0.0, 0.01, 0.05]);
     for op in &report.operating_points {
-        // Counts must add up.
+        // Counts must add up over the claimed families this list covers.
+        assert_eq!(
+            op.counts.true_positives + op.counts.false_negatives,
+            claimed_attack
+        );
+        assert_eq!(
+            op.counts.false_positives + op.counts.true_negatives,
+            claimed_benign
+        );
+        // Achieved FPR must honour the target.
+        assert!(
+            op.false_positive_rate <= op.target_fpr,
+            "target_fpr={} achieved fpr={}",
+            op.target_fpr,
+            op.false_positive_rate
+        );
+    }
+    for op in &report.full_corpus_operating_points {
         assert_eq!(
             op.counts.true_positives + op.counts.false_negatives,
             report.corpus.cases.attack
@@ -106,7 +150,6 @@ fn operating_points_are_wellformed() {
             op.counts.false_positives + op.counts.true_negatives,
             report.corpus.cases.benign
         );
-        // Achieved FPR must honour the target.
         assert!(
             op.false_positive_rate <= op.target_fpr,
             "target_fpr={} achieved fpr={}",
