@@ -73,11 +73,14 @@ transformation, so the field names and the nesting are a contract, not an
 implementation detail.
 
 `interpretation` is a fixed string, serialised immediately after
-`schema_version`: a standing caveat carried in the file itself. It states
-that the reference detector separates this corpus completely, and why that
-is a fact about a corpus and a detector written in the same repository
-rather than evidence that the detector generalises. The text is fixed so
-that a site rendering the numbers cannot present them without it.
+`schema_version`: a standing caveat carried in the file itself. It records
+that the reference detector separates the **claimed** corpus completely — the
+only scope the CI recall/FPR gate covers, reported in `operating_points` — and
+that the unclaimed families beside them document its real misses and false
+positives. `full_corpus_operating_points` reports the unrestricted result over
+every family, claimed or not, so the honest picture is in the file rather than
+hidden by the gate. The text is fixed so that a site rendering the numbers
+cannot present them without it.
 
 ## What this does not cover
 
@@ -92,19 +95,23 @@ that a site rendering the numbers cannot present them without it.
   repository, by the same effort.** A detector evaluated on a corpus written
   alongside it is measuring its own coverage. The result is a reproducible
   statement about this corpus and this detector, and nothing wider.
-- **The reference detector separates this corpus completely.** No attack
-  case is missed and no benign case is flagged. That is a statement about
-  the difficulty of the corpus, not the quality of the detector: a corpus
-  written alongside a detector tends to contain the cases it was built to
-  catch, and a benchmark its own reference implementation passes perfectly
-  has no headroom left to measure anything with. The useful next step is
-  adversarial cases this detector fails — those are what make the number
-  mean something. Read the recall figure as a floor for regression
-  detection, not as an effectiveness claim.
-- **The coverage is Unicode-level smuggling and confusables.** It does not
-  cover natural-language jailbreaks, multi-turn manipulation,
-  retrieved-content injection, or any attack that is plain ASCII with no
-  encoding trick.
+- **The reference detector separates the claimed corpus completely, and
+  misses defined classes on the full one.** Every family carries a `claimed`
+  flag. On the claimed families — exactly the set the CI gate reads —
+  `operating_points` shows 1.0 recall at zero false positives. The unclaimed
+  families document what that number hides: whole classes of attack that
+  carry no Unicode-class signal are missed outright — instructions hidden in
+  HTML comments, markdown link titles, and CSS-invisible spans, base64 and
+  rot13 payloads, homoglyph instructions whose every letter is substituted,
+  and zero-width steganography placed only at word boundaries — while
+  legitimate CJK ideographic variation sequences are flagged as false
+  positives at the looser targets. `full_corpus_operating_points` in
+  `results.json` is the honest picture over every family. Read the recall
+  figure as a floor for regression detection, not as an effectiveness claim.
+- **The coverage is Unicode-level smuggling and confusables.** The unclaimed
+  families extend it to the plain-ASCII and structural attacks the detector
+  provably cannot see, but it still does not cover natural-language
+  jailbreaks, multi-turn manipulation, or retrieved-content injection.
 - **Recall is per case, not weighted by severity.** A missed case and a
   missed class count the same.
 - **No adversary adapts to it.** These are fixed cases. An attacker who reads

@@ -152,6 +152,8 @@ fn run(options: Options) -> Result<(), String> {
         println!("wrote {}", options.out_path.display());
     }
 
+    // The baseline recall gate covers only claimed families: `operating_points`
+    // is the claimed-scoped list, so unclaimed families are never gated.
     check_baseline(&options, &detector, &report.operating_points)
 }
 

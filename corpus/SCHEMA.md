@@ -47,6 +47,17 @@ A family file is a single JSON object with exactly these fields:
   a family is never mixed.
 - `description` (string, required): one or two sentences on what this family
   is and why it belongs in the corpus.
+- `claimed` (boolean, optional, default `true`): whether the benchmark
+  **claims** this family is handled correctly. For an attack family, a claim
+  means the detector is expected to detect it; for a benign family, a claim
+  means the family is expected to present a clean false-positive profile. The
+  CI recall/FPR gate (`baseline.json`) applies **only** to `claimed: true`
+  families: an unclaimed family is still scored and reported in full (see
+  `full_corpus_operating_points` in `results.json`) for transparency, but its
+  cases do not enter the gated `operating_points` and so cannot lower a recall
+  floor. Omitted means `true`, so a family is claimed unless it says
+  otherwise; only deliberately add `"claimed": false` to a family whose
+  failures or false positives are being documented rather than gated.
 - `cases` (array, required, non-empty): the cases, each matching the case
   schema below.
 
@@ -57,6 +68,7 @@ Skeleton:
   "family": "example-family",
   "label": "attack",
   "description": "One or two sentences on what this family is and why it belongs in the corpus.",
+  "claimed": true,
   "cases": [
     {
       "id": "example-family-01",
@@ -223,6 +235,8 @@ does.
 
 - One file per family at `corpus/cases/<label>/<family>.json`; `family` equals
   the file stem; `label` is exactly `"attack"` or `"benign"`.
+- `claimed` is omitted (defaulting to `true`) unless the family is being
+  documented rather than gated, in which case it is explicitly `false`.
 - Every case has `id`, `title`, `text`, `rationale`, `source`; ids are
   globally unique and zero-padded; `source.id` exists in `sources.json`.
 - No codepoint from the banned list appears literally anywhere in the file —
